@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
 
+import 'package:flutter/material.dart';
 import '../components/dialog_box.dart';
 import '../components/to_do_tile.dart';
 import '../models/tile_model.dart';
@@ -15,9 +15,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<TileModel> toDoList = [];
 
-  void getList() {
-    toDoList = TileModel.getList();
-  }
+  // void getList() {
+  //   toDoList = TileModel.getList();
+  // }
 
   List toDoList1 = [
     ["Make Tuto", false],
@@ -35,16 +35,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  //save a ew task
+  //save a new task
   void saveNewTask() {
     setState(() {
-      toDoList1.add([_controller.text, false]);
-      _controller.clear();
+      if (_controller.text != '\n') {
+        toDoList1.add([_controller.text, false]);
+        _controller.clear();
+      }
     });
     Navigator.of(context).pop();
   }
 
-  //create new task
+  //create a new task
   void createNawTask() {
     showDialog(
       context: context,
@@ -58,9 +60,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //delete task
+  void deleteTask(int index) {
+    setState(() {
+      toDoList1.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    getList();
+    // getList();
     return Scaffold(
       backgroundColor: Color(0xFF436573),
       appBar: AppBar(
@@ -90,6 +99,7 @@ class _HomePageState extends State<HomePage> {
             taskName: toDoList1[index][0],
             taskCompleted: toDoList1[index][1],
             onChanged: (value) => checkBoxChanged(value, index),
+            deleteFunction: (context) => deleteTask,
           );
 
           // return Padding(
