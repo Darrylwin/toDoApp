@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../components/dialog_box.dart';
 import '../components/to_do_tile.dart';
 import '../models/tile_model.dart';
 
@@ -19,15 +21,41 @@ class _HomePageState extends State<HomePage> {
 
   List toDoList1 = [
     ["Make Tuto", false],
-    ["Do smthg", true],
-    ["Do smthg", true],
+    ["Do smthg", false],
+    ["Do smthg", false],
   ];
+
+  // text controller
+  final _controller = TextEditingController();
 
   //checkbox was tapped
   void checkBoxChanged(bool? value, int index) {
     setState(() {
       toDoList1[index][1] = !toDoList1[index][1];
     });
+  }
+
+  //save a ew task
+  void saveNewTask() {
+    setState(() {
+      toDoList1.add([_controller.text, false]);
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
+  //create new task
+  void createNawTask() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return DialogBox(
+          controller: _controller,
+          onCancel: () => Navigator.of(context).pop(),
+          onSave: saveNewTask,
+        );
+      },
+    );
   }
 
   @override
@@ -47,6 +75,14 @@ class _HomePageState extends State<HomePage> {
         ),
         elevation: 0,
         centerTitle: true,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: createNawTask,
+        backgroundColor: Color(0xFF193540),
+        child: Icon(
+          Icons.add,
+          color: Colors.white70,
+        ),
       ),
       body: ListView.builder(
         itemBuilder: (context, index) {
