@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/components/my_button.dart';
 
 class DialogBox extends StatelessWidget {
-  final controller;
+  final TextEditingController? controller;
   final VoidCallback onSave;
   final VoidCallback onCancel;
   const DialogBox({
@@ -41,14 +41,14 @@ class DialogBox extends StatelessWidget {
 
             //buttons save and cancel
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 //save button
                 MyButton(
                   text: "Save",
                   onPressed: onSave,
                 ),
-                const SizedBox(width: 8.0),
+                const SizedBox(width: 4.5),
                 //cancel button
                 MyButton(
                   text: "Cancel",
