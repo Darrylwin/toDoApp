@@ -21,23 +21,24 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = true; //for manage state
 
   Future getUsers() async {
-    String baseUrl = 'https://randomuser.me/api/';
+    String baseUrl = 'https://randomuser.me/api/?results=10';
     var response = await http.get(Uri.parse(baseUrl));
     var jsonData = jsonDecode(response.body);
 
-    for (var eachUser in jsonData["results"]) {
-      final user = TileModel(
-        taskName: "${eachUser['name']['first']} ${eachUser['name']['last']}",
-        taskCompleted: false,
-      );
-
-      toDoList.add([
-        user.taskName,
-        user.taskCompleted,
-      ]);
-    }
-
     setState(() {
+      toDoList.clear();
+      for (var eachUser in jsonData["results"]) {
+        final user = TileModel(
+          taskName: "${eachUser['name']['first']} ${eachUser['name']['last']}",
+          taskCompleted: false,
+        );
+
+        toDoList.add([
+          user.taskName,
+          user.taskCompleted,
+        ]);
+      }
+
       isLoading = false; // Marque le chargement comme terminé
     });
 
