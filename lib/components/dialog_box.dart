@@ -5,9 +5,9 @@ import 'package:myapp/components/my_button.dart';
 
 class DialogBox extends StatelessWidget {
   final controller;
-  VoidCallback onSave;
-  VoidCallback onCancel;
-  DialogBox({
+  final VoidCallback onSave;
+  final VoidCallback onCancel;
+  const DialogBox({
     super.key,
     required this.controller,
     required this.onCancel,
@@ -18,7 +18,7 @@ class DialogBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Color.fromARGB(255, 11, 59, 78),
-      content: Container(
+      content: SizedBox(
         height: 120,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
