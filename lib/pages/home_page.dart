@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../components/dialog_box.dart';
 import '../components/to_do_tile.dart';
 import '../models/tile_model.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -13,25 +15,40 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<TileModel> toDoList = [];
-
-  // void getList() {
-  //   toDoList = TileModel.getList();
-  // }
-
-  List toDoList1 = [
-    ["Make Tuto", false],
-    ["Do smthg", false],
-    ["Do smthg", false],
-  ];
-
   // text controller
   final _controller = TextEditingController();
+  List toDoList = []; //list of items
+  bool isLoading = true; //for manage state
+
+  Future getUsers() async {
+    String baseUrl = 'https://randomuser.me/api/';
+    var response = await http.get(Uri.parse(baseUrl));
+    var jsonData = jsonDecode(response.body);
+
+    for (var eachUser in jsonData["results"]) {
+      final user = TileModel(
+        taskName: "${eachUser['name']['first']} ${eachUser['name']['last']}",
+        taskCompleted: false,
+      );
+
+      toDoList.add([
+        user.taskName,
+        user.taskCompleted,
+      ]);
+    }
+
+    setState(() {
+      isLoading = false; // Marque le chargement comme terminé
+    });
+
+    print("Nombre de users: ${toDoList.length}");
+    print("Corps obtenu: ${response.body}");
+  }
 
   //checkbox was tapped
   void checkBoxChanged(bool? value, int index) {
     setState(() {
-      toDoList1[index][1] = !toDoList1[index][1];
+      toDoList[index][1] = !toDoList[index][1];
     });
   }
 
@@ -39,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   void saveNewTask() {
     setState(() {
       if (_controller.text != '\n') {
-        toDoList1.add([_controller.text, false]);
+        toDoList.add([_controller.text, false]);
         _controller.clear();
       }
     });
@@ -63,13 +80,18 @@ class _HomePageState extends State<HomePage> {
   //delete task
   void deleteTask(int index) {
     setState(() {
-      toDoList1.removeAt(index);
+      toDoList.removeAt(index);
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    getUsers();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // getList();
     return Scaffold(
       backgroundColor: Color(0xFF436573),
       appBar: AppBar(
@@ -93,42 +115,17 @@ class _HomePageState extends State<HomePage> {
           color: Colors.white70,
         ),
       ),
-      body: ListView.builder(
-        itemBuilder: (context, index) {
-          return ToDoTile(
-            taskName: toDoList1[index][0],
-            taskCompleted: toDoList1[index][1],
-            onChanged: (value) => checkBoxChanged(value, index),
-            deleteFunction: (context) => deleteTask,
-          );
-
-          // return Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: Container(
-          //     padding: EdgeInsets.all(12 * 2),
-          //     decoration: BoxDecoration(
-          //       color: Color(0xFF193540),
-          //       borderRadius: BorderRadius.circular(15),
-          //     ),
-          //     child: Row(
-          //       children: [
-          //         // checkbox
-          //         Checkbox(value: taskCompleted, onChanged: onChanged),
-
-          //         //task
-          //         Text(
-          //           taskName,
-          //           style: TextStyle(
-          //             color: Colors.white70,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // );
-        },
-        itemCount: toDoList1.length,
-      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator(color: Colors.black))
+          : ListView.builder(
+              itemCount: toDoList.length,
+              itemBuilder: (context, index) => ToDoTile(
+                taskName: toDoList[index][0],
+                taskCompleted: toDoList[index][1],
+                onChanged: (value) => checkBoxChanged(value, index),
+                deleteFunction: (context) => deleteTask,
+              ),
+            ),
     );
   }
 }
